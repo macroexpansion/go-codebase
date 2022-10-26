@@ -2,14 +2,18 @@ package main
 
 import (
 	"fmt"
+	"log"
 
-	"lib"
-	"lib/hello_lib"
+	"kafka"
 )
 
 func main() {
 	fmt.Println("test")
 
-	lib.External()
-	hello_lib.Hello()
+	producer, err := kafka.ConnectProducer([]string{"localhost:9092"})
+	_ = producer
+	if err != nil {
+		log.Fatal("Error connecting Kafka")
+	}
+	defer producer.Close()
 }
