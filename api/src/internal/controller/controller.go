@@ -2,6 +2,7 @@ package controller
 
 import "encoding/json"
 import "net/http"
+import "github.com/go-playground/validator/v10"
 
 type Response struct {
 	Status  string `json:"status, omitempty"`
@@ -22,6 +23,8 @@ func NewResponseJson(status string, message string, data any) ([]byte, error) {
 	}
 	return response.toJson()
 }
+
+var validate *validator.Validate = validator.New()
 
 type Controller struct{}
 

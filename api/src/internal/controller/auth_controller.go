@@ -14,8 +14,8 @@ func NewAuthController(db *gorm.DB) *AuthController {
 }
 
 type AuthParam struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 func (c *AuthController) Register(res http.ResponseWriter, req *http.Request) {
@@ -30,7 +30,7 @@ func (c *AuthController) Register(res http.ResponseWriter, req *http.Request) {
 		Username: params.Username,
 		Password: params.Password,
 	}
-	if err := c.db.Create(&account).Error; err != nil {
+	if err := c.db.Debug().Create(&account).Error; err != nil {
 		json.NewEncoder(res).Encode(&Response{Message: err.Error()})
 		return
 	}
@@ -50,8 +50,14 @@ func (c *AuthController) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	validation := validate.Struct(params)
+	if validation != nil {
+		json.NewEncoder(res).Encode(&Response{Message: "Validate Error"})
+		return
+	}
+
 	var account models.Account
-	if err := c.db.Where(&models.Account{Username: params.Username}).First(&account).Error; err != nil {
+	if err := c.db.Debug().Where("username = ?", params.Username).First(&account).Error; err != nil {
 		json.NewEncoder(res).Encode(&Response{Message: "Login Error"})
 		return
 	}
