@@ -1,24 +1,38 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
+	"net/http"
 
-	"api/lib"
-	"api/lib/hello_lib"
-	"api/src/internal"
-	"api/src/internal/controllers"
+	"github.com/joho/godotenv"
 
 	"pgsql"
+	pgmodels "pgsql/models"
+	"api/src/internal/router"
 )
 
 func main() {
-	fmt.Println("test")
-
-	internal.Hello()
-	hello_lib.Hello()
-
-	controllers.Login()
-	lib.External()
+	env := os.Getenv("APP_ENV")
+	if env == "" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+	}
 
 	pgsql.Hello()
+	/* db := pgsql.Connect(os.Getenv("PGSQL_HOST"), os.Getenv("PGSQL_USER"), os.Getenv("PGSQL_PASSWORD"), os.Getenv("PGSQL_DBNAME"))
+	_ = db */
+
+	account := pgmodels.Account{
+		Username: "quang",
+		Password: "qwe123",
+	}
+	println(account.Username)
+
+	http.Handle("/", router.Router())
+
+	log.Println("Listen on port 3000")
+	log.Fatal(http.ListenAndServe(":3000", nil))
 }
