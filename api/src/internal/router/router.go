@@ -6,6 +6,8 @@ import (
 
 	c "api/src/internal/controller"
 	"api/src/internal/middleware"
+
+	"pgsql/repos"
 )
 
 func Router(db *gorm.DB) *mux.Router {
@@ -15,7 +17,8 @@ func Router(db *gorm.DB) *mux.Router {
 	controller := c.NewController()
 	pingRoute(router, controller)
 
-	authController := c.NewAuthController(db)
+	accountRepo := repos.NewAccountRepo(db)
+	authController := c.NewAuthController(accountRepo)
 	authRoute(router, authController)
 
 	return router

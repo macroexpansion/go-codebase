@@ -1,16 +1,19 @@
 package controller
 
-import "net/http"
-import "encoding/json"
-import "gorm.io/gorm"
-import "pgsql/models"
+import (
+	"encoding/json"
+	"net/http"
+
+	"pgsql/models"
+	"pgsql/repos"
+)
 
 type AuthController struct {
-	db *gorm.DB
+	acc repos.AccountInterface
 }
 
-func NewAuthController(db *gorm.DB) *AuthController {
-	return &AuthController{db: db}
+func NewAuthController(acc repos.AccountInterface) *AuthController {
+	return &AuthController{acc: acc}
 }
 
 type AuthParam struct {
@@ -30,7 +33,7 @@ func (c *AuthController) Register(res http.ResponseWriter, req *http.Request) {
 		Username: params.Username,
 		Password: params.Password,
 	}
-	if err := c.db.Debug().Create(&account).Error; err != nil {
+	if err := c.acc.Save(&account); err != nil {
 		json.NewEncoder(res).Encode(&Response{Message: err.Error()})
 		return
 	}
@@ -56,8 +59,8 @@ func (c *AuthController) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var account models.Account
-	if err := c.db.Debug().Where("username = ?", params.Username).First(&account).Error; err != nil {
+	account, err := c.acc.FindByUsername(params.Username)
+	if err != nil {
 		json.NewEncoder(res).Encode(&Response{Message: "Login Error"})
 		return
 	}
