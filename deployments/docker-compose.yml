@@ -1,15 +1,25 @@
 version: '2'
 
 services:
-  postgresql:
-    image: docker.io/bitnami/postgresql:latest
-    ports:
-      - '5432:5432'
-    volumes:
-      - 'postgresql_data:/bitnami/postgresql'
+  # postgresql:
+  #   image: docker.io/bitnami/postgresql:latest
+  #   ports:
+  #     - '5432:5432'
+  #   volumes:
+  #     - 'postgresql_data:/bitnami/postgresql'
+  #   environment:
+  #     - POSTGRESQL_DATABASE=dev
+  #     - POSTGRESQL_PASSWORD=qwe123
+
+  mongodb:
+    image: docker.io/bitnami/mongodb:6.0
     environment:
-      - POSTGRESQL_DATABASE=dev
-      - POSTGRESQL_PASSWORD=qwe123
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MONGODB_SYSTEM_LOG_VERBOSITY=3
+    ports:
+      - "27017:27017"
+    volumes:
+      - 'mongodb_data:/bitnami/mongodb'
 
   redis:
     image: docker.io/bitnami/redis:latest
@@ -57,8 +67,11 @@ volumes:
   kafka_data:
     driver: local
 
-  postgresql_data:
-    driver: local
+  # postgresql_data:
+  #   driver: local
 
   redis_data:
+    driver: local
+
+  mongodb_data:
     driver: local
